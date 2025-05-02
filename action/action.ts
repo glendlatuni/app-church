@@ -344,6 +344,72 @@ export async function loginWithEmailPassword(email: string, password: string) {
 }
 
 
+export async function signIn(email: string, password: string) {
+  const supabase = await createClient()
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/verify`
+      }
+    })
+
+
+
+    if (error) {
+      console.error("Login error:", error.message)
+      return { success: false, error: error.message }
+    }
+
+    // Jika berhasil
+    return { success: true, data }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    console.error("Unexpected error during login:", error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Terjadi kesalahan saat login" 
+    }
+  }
+}
+
+
+
+export async function googleSigin() {
+  const supabase = await createClient()
+
+  try {
+    const { error, data } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/verify`
+      }
+    })
+
+    
+    if (error) {
+      console.error("Login error:", error.message)
+      return { success: false, error: error.message }
+    }
+
+    // Jika berhasil
+    return { success: true, data }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    console.error("Unexpected error during login:", error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : "Terjadi kesalahan saat login" 
+    }
+  }
+  
+}
+
+
+
 
 export async function getUser(): Promise<{ user: User | null, error: string | null }> {
   const supabase = await createClient();
@@ -405,3 +471,38 @@ export async function getJemaatInfo(userId: string): Promise<{ jemaat: Jemaat | 
     return { jemaat: null, error: "Unexpected error occurred" };
   }
 }
+
+
+
+export async function countData(){
+  const supabase = await createClient()
+
+  const {count, error} = await supabase.from('jemaat').select('*',{count:'exact', head: true})
+
+  if (error){
+    console.log("where the fuck is data")
+  }
+return count
+}
+
+export async function countGender(gender:string){
+  const supabase = await createClient()
+
+  const {count, error} = await supabase.from('jemaat').select('*',{count:'exact', head: true}).eq('jenis__kelamin', gender)
+
+  if (error){
+    console.log("where the fuck is data")
+  }
+return count
+}
+
+export async function countByCategory(category:string){
+  const supabase = await createClient()
+
+  const {count, error} = await supabase.from('jemaat').select('*',{count:'exact', head: true}).eq('kategori', category)
+
+  if (error){
+    console.log("where the fuck is data")
+  }
+return count
+  }

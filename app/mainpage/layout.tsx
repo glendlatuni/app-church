@@ -20,7 +20,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { supabase } from "@/utils/supabase/client"
 import { User } from "@supabase/supabase-js"
-import { Jemaat } from "@/lib/interface" // Make sure to import your Jemaat interface
+import { Jemaat } from "@/lib/interface" 
 
 interface DashboardLayoutProps {
   children: React.ReactNode
