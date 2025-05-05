@@ -9,6 +9,8 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -52,6 +54,20 @@ export async function middleware(request: NextRequest) {
       },
     }
   )
+
+  const { data: { session } } = await supabase.auth.getSession();
+  const isAuthCallback = request.nextUrl.pathname === '/auth/callback';
+
+  if (session && isAuthCallback) {
+     // Arahkan ke halaman pengecekan setelah callback berhasil
+     return NextResponse.redirect(new URL('/redirecting', request.url));
+  }
+
+  // Jika user mencoba akses halaman yang butuh login TAPI belum login
+  // Arahkan ke login (logika ini mungkin sudah ada)
+  // if (!session && request.nextUrl.pathname.startsWith('/mainpage')) {
+  //   return NextResponse.redirect(new URL('/login', request.url));
+  // }
 
   await supabase.auth.getUser()
 

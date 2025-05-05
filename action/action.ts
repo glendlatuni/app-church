@@ -11,6 +11,10 @@ import {
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { User } from "@supabase/supabase-js";
+import { z } from 'zod';
+
+const ActivationCodeSchema = z.string().length(8, "Activation code must be 8 characters long"); // Sesuaikan panjangnya
+
 
 export async function getMajelisData(): Promise<MajelisWithDetails[]> {
   const supabase = await createClient();
@@ -505,4 +509,108 @@ export async function countByCategory(category:string){
     console.log("where the fuck is data")
   }
 return count
+  }
+
+
+  export async function activateAccount(code: string): Promise<{ success: boolean; error?: string }> {
+
+  
+
+    const supabase = await createClient();
+  
+    // 1. Validasi input
+    const validation = ActivationCodeSchema.safeParse(code);
+    if (!validation.success) {
+      return { success: false, error: validation.error.errors[0]?.message || 'Invalid activation code format.' };
+    }
+    const validatedCode = validation.data;
+  
+    // 2. Dapatkan sesi user saat ini
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+    if (authError || !user) {
+      console.error('Authentication Error:', authError);
+      return { success: false, error: 'You must be logged in to activate your account.' };
+    }
+  
+    // 3. Cari jemaat berdasarkan activation_code
+    const { data: jemaatData, error: selectError } = await supabase
+      .from('jemaat')
+      .select('id, auth_users') // Pilih id dan auth_users untuk pengecekan
+      .eq('activation_code', validatedCode)
+      .maybeSingle(); // Harusnya hanya ada satu atau tidak ada sama sekali
+  
+    if (selectError) {
+      console.error('Error fetching jemaat by activation code:', selectError);
+      return { success: false, error: 'Database error checking activation code.' };
+    }
+  
+    if (!jemaatData) {
+      return { success: false, error: 'Invalid or expired activation code.' };
+    }
+  
+    // 4. Periksa apakah jemaat sudah tertaut ke user lain
+    //    Atau apakah user ini sudah tertaut ke jemaat lain (opsional tapi bagus)
+    if (jemaatData.auth_users && jemaatData.auth_users !== user.id) {
+       return { success: false, error: 'This activation code is already linked to another user.' };
+    }
+     if (jemaatData.auth_users === user.id) {
+       // Jika sudah tertaut ke user yang sama, anggap sukses (mungkin user mencoba lagi)
+       return { success: true };
+    }
+  
+  
+    // 5. Update tabel jemaat: set auth_users = user.id
+    const { error: updateError } = await supabase
+      .from('jemaat')
+      .update({ auth_users: user.id })
+      .eq('id', jemaatData.id); // Gunakan id jemaat yang ditemukan
+  
+    if (updateError) {
+      console.error('Error updating jemaat auth_users:', updateError);
+      // Cek spesifik jika error karena unique constraint pada auth_users (jika ada)
+      if (updateError.code === '23505') { // Kode error unique violation PostgreSQL
+          return { success: false, error: 'This login is already linked to another jemaat record.' };
+      }
+      return { success: false, error: 'Failed to link account to jemaat record.' };
+    }
+  
+    // 6. (Opsional tapi direkomendasikan) Hapus atau null-kan activation_code setelah berhasil digunakan
+      //  Ini mencegah kode digunakan kembali. Anda bisa memilih salah satu:
+    const { error: clearCodeError } = await supabase
+      .from('jemaat')
+      .update({ activation_code: null }) // Atau string kosong ''
+      .eq('id', jemaatData.id);
+    if (clearCodeError) {
+      console.warn('Could not clear activation code after use:', clearCodeError);
+    }
+  
+  
+    return { success: true };
+  }
+  
+  // Server Action tambahan untuk memeriksa status aktivasi
+  export async function checkActivationStatus(): Promise<{ isActivated: boolean; error?: string }> {
+
+   
+      const supabase = await createClient();
+  
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+      if (authError || !user) {
+          return { isActivated: false, error: 'Not authenticated' };
+      }
+  
+      const { data, error: checkError } = await supabase
+          .from('jemaat')
+          .select('id') // Cukup cek keberadaannya
+          .eq('auth_users', user.id)
+          .maybeSingle();
+  
+      if (checkError) {
+          console.error('Error checking activation status:', checkError);
+          return { isActivated: false, error: 'Database error checking activation.' };
+      }
+  
+      return { isActivated: data !== null };
   }
