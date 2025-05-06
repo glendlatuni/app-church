@@ -468,10 +468,41 @@ export async function getJemaatInfo(userId: string): Promise<{ jemaat: Jemaat | 
 }
 
 // --- Fungsi counting tetap sama ---
-export async function countData(){ ... }
-export async function countGender(gender:string){ ... }
-export async function countByCategory(category:string){ ... }
+export async function countData(){
+  const cookieStore = cookies();
+  const supabase = await createClient(cookieStore)
 
+  const {count, error} = await supabase.from('jemaat').select('*',{count:'exact', head: true})
+
+  if (error){
+    console.log("where the fuck is data")
+  }
+return count
+}
+
+export async function countGender(gender:string){
+  const cookieStore = cookies();
+  const supabase = await createClient(cookieStore)
+
+  const {count, error} = await supabase.from('jemaat').select('*',{count:'exact', head: true}).eq('jenis__kelamin', gender)
+
+  if (error){
+    console.log("where the fuck is data")
+  }
+return count
+}
+
+export async function countByCategory(category:string){
+  const cookieStore = cookies();
+  const supabase = await createClient(cookieStore)
+
+  const {count, error} = await supabase.from('jemaat').select('*',{count:'exact', head: true}).eq('kategori', category)
+
+  if (error){
+    console.log("where the fuck is data")
+  }
+return count
+  }
 
 // Fungsi activateAccount (ini masih diperlukan untuk alur Google Sign In)
 export async function activateAccount(code: string): Promise<{ success: boolean; error?: string }> {
