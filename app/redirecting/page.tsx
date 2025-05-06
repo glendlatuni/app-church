@@ -9,7 +9,7 @@ import { toast } from 'sonner'; // Untuk notifikasi
 export default function RedirectingPage() {
   const router = useRouter();
   const [message, setMessage] = useState('Checking your account status, please wait...');
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkStatusAndRedirect = async () => {
@@ -46,7 +46,7 @@ export default function RedirectingPage() {
           // Pengguna belum teraktivasi/tertaut, arahkan ke halaman aktivasi
           setTimeout(() => router.push('/activate'), 1500); // Redirect ke /activate
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Redirecting page unexpected error:', err);
         setMessage('An unexpected error occurred. Redirecting to login...');
         toast.error('An unexpected error occurred.');

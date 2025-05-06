@@ -1,3 +1,4 @@
+
 "use server";
 
 import {
@@ -10,6 +11,13 @@ import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { User } from "@supabase/supabase-js";
 import { z } from 'zod';
+
+interface jemaatByActivation {
+  id: string;
+  auth_users: string;
+  activation_code: string;
+  nama_jemaat: string;
+}
 
 // Skema validasi Zod (bisa diletakkan di atas atau di dalam fungsi jika hanya dipakai sekali)
 const SignUpSchema = z.object({
@@ -112,9 +120,9 @@ export async function signUpWithActivationCode(
     console.log(`Successfully linked User ${newUserId} to Jemaat ${jemaatIdToLink}.`);
     return { success: true };
 
-  } catch (err: any) {
+  } catch (err: unknown) {
       console.error("Unexpected error in signUpWithActivationCode:", err);
-      return { success: false, error: err.message || 'An unexpected server error occurred.' };
+      return { success: false, error: 'An unexpected server error occurred.' };
   }
 }
 // --- Akhir SERVER ACTION BARU ---
@@ -434,7 +442,7 @@ export async function getUser(): Promise<{ user: User | null, error: string | nu
       return { user: null, error: error.message };
     }
     return { user, error: null };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Unexpected error in getUser:", error);
     return { user: null, error: "Unexpected error occurred getting user" };
   }
@@ -505,7 +513,9 @@ return count
   }
 
 // Fungsi activateAccount (ini masih diperlukan untuk alur Google Sign In)
-export async function activateAccount(code: string): Promise<{ success: boolean; error?: string }> {
+export async function activateAccount(code: string): Promise<{ success: boolean; error?: string; jemaatData?: jemaatByActivation }> {
+  console.log(`Activating account with code: ${code}`);
+
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
 
@@ -525,9 +535,13 @@ export async function activateAccount(code: string): Promise<{ success: boolean;
   // 2. Cari jemaat berdasarkan KODE AKTIVASI
   const { data: jemaatData, error: selectError } = await supabase
     .from('jemaat')
-    .select('id, auth_users, activation_code')
+    .select('id, auth_users, activation_code, nama_jemaat')
     .eq('activation_code', validatedCode)
     .maybeSingle();
+
+
+
+
 
   if (selectError) {
     console.error('Error fetching jemaat by activation code:', selectError);
@@ -585,7 +599,7 @@ export async function activateAccount(code: string): Promise<{ success: boolean;
     return { success: false, error: `Failed to link account: ${updateError.message}` };
   }
 
-  return { success: true };
+  return { success: true, jemaatData };
 }
 
 // Fungsi checkActivationStatus (masih diperlukan untuk alur Google Sign In)

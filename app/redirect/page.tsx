@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'; // Komponen loading
 export default function RedirectingPage() {
   const router = useRouter();
   const [message, setMessage] = useState('Checking your account status...');
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkStatusAndRedirect = async () => {
@@ -31,7 +31,7 @@ export default function RedirectingPage() {
           // Pengguna belum teraktivasi/tertaut, arahkan ke halaman aktivasi
            setTimeout(() => router.push('/activate'), 1500); // Redirect ke /activate
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Redirection check failed:', err);
         setMessage('An unexpected error occurred. Redirecting to login...');
          setTimeout(() => router.push('/login'), 3000);

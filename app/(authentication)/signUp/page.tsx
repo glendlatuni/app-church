@@ -33,9 +33,9 @@ export default function SignUpPage() {
       } else {
         throw new Error(result.error || 'Sign up failed. Please check your details.');
       }
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message || 'Sign up failed.');
+    } catch (err: unknown) {
+      setError(error);
+      toast.error(error || 'Sign up failed.');
       console.error('Sign Up Error:', err);
       setLoading(false); // Hanya set loading false jika ada error
     }

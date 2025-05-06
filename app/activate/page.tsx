@@ -23,6 +23,8 @@ export default function ActivatePage() {
     try {
       const result = await activateAccount(activationCode.trim()); // Panggil Server Action
 
+      console.log("==============================",result.jemaatData?.nama_jemaat);
+
       if (result.success) {
         toast.success('Account activated successfully! Redirecting...');
         // Arahkan ke halaman utama setelah aktivasi berhasil
@@ -33,9 +35,9 @@ export default function ActivatePage() {
       } else {
         throw new Error(result.error || 'Activation failed. Please check the code.');
       }
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message || 'Activation failed.');
+    } catch (err: unknown) {
+      setError(error);
+      toast.error(error|| 'Activation failed.');
       console.error('Activation Error:', err);
       setLoading(false);
     }
