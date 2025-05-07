@@ -1,55 +1,60 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { checkActivationStatus } from '@/action/action'; // Import action checker
-import { Skeleton } from '@/components/ui/skeleton'; // Komponen loading
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Mail, CheckCircle, ArrowRight } from "lucide-react"
 
-export default function RedirectingPage() {
-  const router = useRouter();
-  const [message, setMessage] = useState('Checking your account status...');
-  // const [isLoading, setIsLoading] = useState(true);
+export default function RedirectPage() {
+  const router = useRouter()
+  const [countdown, setCountdown] = useState(3)
 
   useEffect(() => {
-    const checkStatusAndRedirect = async () => {
-      try {
-        // Panggil Server Action untuk memeriksa apakah user sudah terhubung ke data jemaat
-        const { isActivated, error } = await checkActivationStatus();
+    const timer = setTimeout(() => {
+      router.push("/")
+    }, 3000)
 
-        if (error && error !== 'Not authenticated') { // Abaikan error not authenticated jika user belum login
-          setMessage(`Error: ${error}. Redirecting to login...`);
-           setTimeout(() => router.push('/login'), 3000);
-           return;
-        }
+    const interval = setInterval(() => {
+      setCountdown((prev) => prev - 1)
+    }, 1000)
 
-        if (isActivated) {
-          setMessage('Account verified. Redirecting to dashboard...');
-          // Pengguna sudah teraktivasi/tertaut, arahkan ke halaman utama
-           setTimeout(() => router.push('/'), 1500); // Redirect ke /
-        } else {
-          setMessage('Account activation required. Redirecting...');
-          // Pengguna belum teraktivasi/tertaut, arahkan ke halaman aktivasi
-           setTimeout(() => router.push('/activate'), 1500); // Redirect ke /activate
-        }
-      } catch (err: unknown) {
-        console.error('Redirection check failed:', err);
-        setMessage('An unexpected error occurred. Redirecting to login...');
-         setTimeout(() => router.push('/login'), 3000);
-      } finally {
-         // setIsLoading(false); // Loading bisa dimatikan jika perlu interaksi lain
-      }
-    };
-
-    checkStatusAndRedirect();
-  }, [router]);
+    return () => {
+      clearTimeout(timer)
+      clearInterval(interval)
+    }
+  }, [router])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
-       {/* Tampilkan loading skeleton atau spinner */}
-       <Skeleton className="h-8 w-64 rounded-md" />
-       <Skeleton className="h-4 w-48 rounded-md" />
-       <p className="text-muted-foreground">{message}</p>
-       {/* Anda bisa menambahkan logo atau animasi loading di sini */}
+    <div className="flex min-h-screen items-center justify-center bg-white p-4">
+      <Card className="w-full max-w-md border-black/10 shadow-lg">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-black text-white">
+            <CheckCircle className="h-6 w-6" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Pendaftaran Berhasil!</CardTitle>
+          <CardDescription className="text-gray-500">Akun Anda telah berhasil dibuat</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-center">
+          <div className="rounded-lg bg-gray-50 p-4">
+            <div className="mb-3 flex justify-center">
+              <Mail className="h-8 w-8 text-black" />
+            </div>
+            <p className="text-sm text-gray-600">
+              Silakan periksa email Anda untuk mengaktifkan akun dan melanjutkan proses pendaftaran.
+            </p>
+          </div>
+          <div className="text-sm text-gray-500">
+            Anda akan dialihkan ke halaman utama dalam <span className="font-bold text-black">{countdown}</span> detik
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full bg-black text-white hover:bg-gray-800" onClick={() => router.push("/")}>
+            Kembali ke Halaman Utama
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
-  );
+  )
 }

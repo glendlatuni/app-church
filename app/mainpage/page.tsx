@@ -3,7 +3,7 @@ import { countData, countGender, countByCategory } from "@/action/action"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/context/auth-context"
-import { Users, UserRound, ClipboardList, ArrowUp } from "lucide-react"
+import { Users, UserRound} from "lucide-react"
 import { useQuery, 
  // useQueryClient 
 } from "@tanstack/react-query"
@@ -79,11 +79,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="mt-3">
                   <p className="text-3xl font-bold">{total}</p>
-                  <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                    <ArrowUp className="mr-1 h-3 w-3 text-emerald-500" />
-                    <span className="text-emerald-500 font-medium">12%</span>
-                    <span className="ml-1">dari bulan lalu</span>
-                  </div>
+
                 </div>
               </>
             )}
@@ -107,19 +103,13 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">PRIA</p>
                     <p className="text-2xl font-bold">{pria}</p>
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <ArrowUp className="mr-1 h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">8%</span>
-                    </div>
+        
                   </div>
                   <Separator orientation="vertical" className="h-16" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">WANITA</p>
                     <p className="text-2xl font-bold">{wanita}</p>
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <ArrowUp className="mr-1 h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">14%</span>
-                    </div>
+
                   </div>
                 </div>
               </>
@@ -144,37 +134,25 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">PKB</p>
                     <p className="text-2xl font-bold">{categoryData?.PKB}</p>
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <ClipboardList className="mr-1 h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">8%</span>
-                    </div>
+
                   </div>
                   <Separator orientation="vertical" className="h-16" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">PAM</p>
                     <p className="text-2xl font-bold">{categoryData?.PAM}</p>
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <ClipboardList className="mr-1 h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">14%</span>
-                    </div>
+
                   </div>
                   <Separator orientation="vertical" className="h-16" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">PW</p>
                     <p className="text-2xl font-bold">{categoryData?.PW}</p>
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <ClipboardList className="mr-1 h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">14%</span>
-                    </div>
+
                   </div>
                   <Separator orientation="vertical" className="h-16" />
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">PAR</p>
                     <p className="text-2xl font-bold">{categoryData?.PAR}</p>
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <ClipboardList className="mr-1 h-3 w-3 text-emerald-500" />
-                      <span className="text-emerald-500 font-medium">14%</span>
-                    </div>
+
                   </div>
                 </div>
               </>

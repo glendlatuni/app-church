@@ -104,7 +104,7 @@ export default function DashboardLayout({
   const menuItems = [
     { icon: <Home />, text: "Mainpage", href: "/mainpage" },
     { icon: <BarChart2 />, text: "Data Jemaat", href: "/mainpage/datajemaat" },
-    { icon: <ShoppingCart />, text: "Products", href: "/mainpage/products" },
+    { icon: <ShoppingCart />, text: "Data Majelis", href: "/mainpage/datamajelis" },
     { icon: <Users />, text: "Customers", href: "/mainpage/customers" },
     { icon: <MessageSquare />, text: "Messages", href: "/mainpage/messages", badge: 5 },
   ]

@@ -13,7 +13,7 @@ export default function SignUpPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [activationCode, setActivationCode] = useState(''); // <-- State baru
+  // const [activationCode, setActivationCode] = useState(''); // <-- State baru
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,12 +24,12 @@ export default function SignUpPage() {
 
     try {
       // Panggil Server Action baru
-      const result = await signUpWithActivationCode(email, password, activationCode.trim());
+      const result = await signUpWithActivationCode(email, password);
 
       if (result.success) {
         toast.success('Sign up successful! Please log in.');
         // Redirect ke halaman login setelah sign up berhasil
-        router.push('/login');
+        router.push('/redirect');
       } else {
         throw new Error(result.error || 'Sign up failed. Please check your details.');
       }
@@ -73,19 +73,7 @@ export default function SignUpPage() {
               minLength={6} // Tambahkan validasi dasar di client
             />
           </div>
-          <div> {/* <-- Field Baru */}
-            <Label htmlFor="activationCode">Activation Code</Label>
-            <Input
-              id="activationCode"
-              type="text"
-              value={activationCode}
-              onChange={(e) => setActivationCode(e.target.value)}
-              required
-              disabled={loading}
-              maxLength={8} // Sesuaikan dengan panjang kode Anda
-              placeholder="ABCDEFGH"
-            />
-          </div>
+
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Signing Up...' : 'Sign Up'}

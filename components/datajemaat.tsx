@@ -83,6 +83,7 @@ export default function DataJemaat({ initialData }: DataJemaatProps) {
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
         // Handle nested properties with a helper function
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const getNestedProperty = (obj: any, path: string) => {
           const keys = path.split('.');

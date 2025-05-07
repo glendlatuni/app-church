@@ -15,7 +15,7 @@ import { z } from 'zod';
 interface jemaatByActivation {
   id: string;
   auth_users: string;
-  activation_code: string;
+  // activation_code: string;
   nama_jemaat: string;
 }
 
@@ -23,7 +23,7 @@ interface jemaatByActivation {
 const SignUpSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  activationCode: z.string().length(8, "Activation code must be 8 characters")
+  // activationCode: z.string().length(8, "Activation code must be 8 characters")
 });
 
 const ActivationCodeSchema = z.string().length(8, "Activation code must be 8 characters long");
@@ -33,7 +33,7 @@ const ActivationCodeSchema = z.string().length(8, "Activation code must be 8 cha
 export async function signUpWithActivationCode(
     emailInput: string,
     passwordInput: string,
-    activationCodeInput: string
+    // activationCodeInput: string
 ): Promise<{ success: boolean; error?: string }> {
   
   const cookieStore = cookies();
@@ -43,7 +43,7 @@ export async function signUpWithActivationCode(
   const validation = SignUpSchema.safeParse({
       email: emailInput,
       password: passwordInput,
-      activationCode: activationCodeInput
+      // activationCode: activationCodeInput
   });
 
   if (!validation.success) {
@@ -52,33 +52,33 @@ export async function signUpWithActivationCode(
       return { success: false, error: errors || 'Invalid input.' };
   }
 
-  const { email, password, activationCode } = validation.data;
+  const { email, password } = validation.data;
 
   try {
     // 2. Verifikasi Kode Aktivasi & Status Tautan Jemaat
-    console.log(`Verifying activation code: ${activationCode}`);
-    const { data: jemaatData, error: selectError } = await supabase
-      .from('jemaat')
-      .select('id, auth_users') // Hanya perlu ID dan auth_users
-      .eq('activation_code', activationCode)
-      .maybeSingle();
 
-    if (selectError) {
-      console.error('Error verifying activation code:', selectError);
-      return { success: false, error: 'Database error during code verification.' };
-    }
+    // const { data: jemaatData, error: selectError } = await supabase
+    //   .from('jemaat')
+    //   .select('id, auth_users') // Hanya perlu ID dan auth_users
+    //   .eq('activation_code', activationCode)
+    //   .maybeSingle();
 
-    if (!jemaatData) {
-      console.warn(`Activation code not found: ${activationCode}`);
-      return { success: false, error: 'Invalid activation code.' };
-    }
+    // if (selectError) {
+    //   console.error('Error verifying activation code:', selectError);
+    //   return { success: false, error: 'Database error during code verification.' };
+    // }
 
-    if (jemaatData.auth_users) {
-      console.warn(`Activation code ${activationCode} already linked to user ${jemaatData.auth_users}`);
-      return { success: false, error: 'This activation code has already been used.' };
-    }
+    // if (!jemaatData) {
+    //   console.warn(`Activation code not found: ${activationCode}`);
+    //   return { success: false, error: 'Invalid activation code.' };
+    // }
 
-    const jemaatIdToLink = jemaatData.id; // Simpan ID jemaat
+    // if (jemaatData.auth_users) {
+    //   console.warn(`Activation code ${activationCode} already linked to user ${jemaatData.auth_users}`);
+    //   return { success: false, error: 'This activation code has already been used.' };
+    // }
+
+    // const jemaatIdToLink = jemaatData.id; // Simpan ID jemaat
 
     // 3. Lakukan Sign Up ke Supabase Auth
     console.log(`Attempting Supabase signUp for email: ${email}`);
@@ -101,23 +101,23 @@ export async function signUpWithActivationCode(
     console.log(`Supabase signUp successful. New User ID: ${newUserId}`);
 
     // 4. Update Tabel 'jemaat' - Tautkan User Auth dan Hapus Kode
-    console.log(`Linking User ID ${newUserId} to Jemaat ID ${jemaatIdToLink}`);
-    const { error: updateError } = await supabase
-      .from('jemaat')
-      .update({
-        auth_users: newUserId,
-        activation_code: null // Hapus kode setelah berhasil digunakan
-      })
-      .eq('id', jemaatIdToLink);
+    // console.log(`Linking User ID ${newUserId} to Jemaat ID ${jemaatIdToLink}`);
+    // const { error: updateError } = await supabase
+    //   .from('jemaat')
+    //   .update({
+    //     auth_users: newUserId,
+    //     activation_code: null // Hapus kode setelah berhasil digunakan
+    //   })
+    //   .eq('id', jemaatIdToLink);
 
-    if (updateError) {
-      console.error('Error updating jemaat table after signup:', updateError);
-      // Anda mungkin ingin mencoba menghapus user auth yang baru dibuat di sini sebagai kompensasi
-      // await supabase.auth.admin.deleteUser(newUserId); // Hati-hati, ini butuh admin client
-      return { success: false, error: 'Account created, but failed to link to profile. Please contact support.' };
-    }
+    // if (updateError) {
+    //   console.error('Error updating jemaat table after signup:', updateError);
+    //   // Anda mungkin ingin mencoba menghapus user auth yang baru dibuat di sini sebagai kompensasi
+    //   // await supabase.auth.admin.deleteUser(newUserId); // Hati-hati, ini butuh admin client
+    //   return { success: false, error: 'Account created, but failed to link to profile. Please contact support.' };
+    // }
 
-    console.log(`Successfully linked User ${newUserId} to Jemaat ${jemaatIdToLink}.`);
+    // console.log(`Successfully linked User ${newUserId} to Jemaat ${jemaatIdToLink}.`);
     return { success: true };
 
   } catch (err: unknown) {
