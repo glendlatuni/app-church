@@ -140,4 +140,9 @@ export interface UserJemaatInfoQueryResult {
 
     
     
-  
+    export interface ListItemProps {
+      title: string;
+      subtitle?: string;
+      value?: string;
+      icon?: React.ReactNode;
+    }
